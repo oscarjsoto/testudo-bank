@@ -1691,4 +1691,32 @@ public void testTransferPaysOverdraftAndDepositsRemainder() throws SQLException,
             .build();
     cryptoBTCTransactionTester.test(buyCryptoBTCTransaction);
   }
+
+  /**
+   * Test that BTC can't be sold by users
+   */
+  @Test
+  public void testSellBTCInvalid() throws ScriptException {
+
+    Map<String, Double> initialCryptoBalanceMap = new HashMap<>();
+    initialCryptoBalanceMap.put("BTC", 2.0);
+
+    CryptoTransactionTester cryptoBTCTransactionTester = CryptoTransactionTester.builder()
+            .initialBalanceInDollars(10000)
+            .initialCryptoBalance(initialCryptoBalanceMap)
+            .build();
+
+    cryptoBTCTransactionTester.initialize();
+
+    CryptoTransaction sellCryptoBTCTransaction = CryptoTransaction.builder()
+            .expectedEndingBalanceInDollars(10000)
+            .expectedEndingCryptoBalance(2.0)
+            .cryptoPrice(100)
+            .cryptoAmountToTransact(1.0)
+            .cryptoName("BTC")
+            .cryptoTransactionTestType(CryptoTransactionTestType.SELL)
+            .shouldSucceed(false)
+            .build();
+    cryptoBTCTransactionTester.test(sellCryptoBTCTransaction);
+  }
 }
