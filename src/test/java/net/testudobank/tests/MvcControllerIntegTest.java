@@ -1665,10 +1665,10 @@ public void testTransferPaysOverdraftAndDepositsRemainder() throws SQLException,
   }
 
   /**
-   * Test that BTC can't be bought by users
+   * Test that Invalid Crypto Currency BTC can't be bought by users
    */
   @Test
-  public void testBuyBTCInvalid() throws ScriptException {
+  public void testBuyInvalidCryptoCurrency() throws ScriptException {
 
     Map<String, Double> initialCryptoBalanceMap = new HashMap<>();
     initialCryptoBalanceMap.put("BTC", 0.0);
@@ -1693,10 +1693,10 @@ public void testTransferPaysOverdraftAndDepositsRemainder() throws SQLException,
   }
 
   /**
-   * Test that BTC can't be sold by users
+   * Test that Invalid Crypto Currency BTC can't be sold by users
    */
   @Test
-  public void testSellBTCInvalid() throws ScriptException {
+  public void testSellInvalidCryptoCurrency() throws ScriptException {
 
     Map<String, Double> initialCryptoBalanceMap = new HashMap<>();
     initialCryptoBalanceMap.put("BTC", 2.0);
