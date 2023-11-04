@@ -1719,4 +1719,5 @@ public void testTransferPaysOverdraftAndDepositsRemainder() throws SQLException,
             .build();
     cryptoBTCTransactionTester.test(sellCryptoBTCTransaction);
   }
+
 }
