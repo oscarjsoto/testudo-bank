@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -1582,4 +1583,84 @@ public void testTransferPaysOverdraftAndDepositsRemainder() throws SQLException,
     cryptoTransactionTester.test(cryptoTransaction);
   }
 
+  /**
+   * Test User Flow, Buys ETH, Buys SOL, then Sell SOL
+   */
+  @Test
+  public void testCryptoTransactionUserFlow() throws ScriptException {
+
+    // Buy ETH
+    Map<String, Double> initialCryptoBalanceMap1 = new HashMap<>();
+    initialCryptoBalanceMap1.put("ETH", 0.0);
+
+    CryptoTransactionTester buyCryptoETHTransactionTester = CryptoTransactionTester.builder()
+            .initialBalanceInDollars(10000)
+            .initialCryptoBalance(initialCryptoBalanceMap1)
+            .build();
+
+    buyCryptoETHTransactionTester.initialize();
+
+    CryptoTransaction buyETHCryptoTransaction = CryptoTransaction.builder()
+            .expectedEndingBalanceInDollars(9000)
+            .expectedEndingCryptoBalance(1)
+            .cryptoPrice(1000)
+            .cryptoAmountToTransact(1)
+            .cryptoName("ETH")
+            .cryptoTransactionTestType(CryptoTransactionTestType.BUY)
+            .shouldSucceed(true)
+            .build();
+    buyCryptoETHTransactionTester.test(buyETHCryptoTransaction);
+
+    
+    // Buy SOL
+    clearDB();
+    
+    Map<String, Double> initialCryptoBalanceMap2 = new HashMap<>();
+    initialCryptoBalanceMap2.put("ETH", 1.0);
+
+    CryptoTransactionTester buyCryptoSOLTransactionTester = CryptoTransactionTester.builder()
+            .initialBalanceInDollars(9000)
+            .initialCryptoBalance(initialCryptoBalanceMap2)
+            .build();
+
+    buyCryptoSOLTransactionTester.initialize();
+
+    CryptoTransaction buyCryptoSOLTransaction = CryptoTransaction.builder()
+            .expectedEndingBalanceInDollars(4000)
+            .expectedEndingCryptoBalance(2.0)
+            .cryptoPrice(2500)
+            .cryptoAmountToTransact(2.0)
+            .cryptoName("SOL")
+            .cryptoTransactionTestType(CryptoTransactionTestType.BUY)
+            .shouldSucceed(true)
+            .build();
+    buyCryptoSOLTransactionTester.test(buyCryptoSOLTransaction);
+
+
+    // Sell SQL
+    clearDB();
+
+    Map<String, Double> initialCryptoBalanceMap3 = new HashMap<>();
+    initialCryptoBalanceMap3.put("ETH", 1.0);
+    initialCryptoBalanceMap3.put("SOL", 2.0);
+
+    CryptoTransactionTester sellCryptoSOLTransactionTester = CryptoTransactionTester.builder()
+            .initialBalanceInDollars(4000)
+            .initialCryptoBalance(initialCryptoBalanceMap3)
+            .build();
+
+    sellCryptoSOLTransactionTester.initialize();
+
+    CryptoTransaction sellSOLTransaction = CryptoTransaction.builder()
+            .expectedEndingBalanceInDollars(4100)
+            .expectedEndingCryptoBalance(1.0)
+            .cryptoPrice(100)
+            .cryptoAmountToTransact(1.0)
+            .cryptoName("SOL")
+            .cryptoTransactionTestType(CryptoTransactionTestType.SELL)
+            .shouldSucceed(true)
+            .build();
+
+    sellCryptoSOLTransactionTester.test(sellSOLTransaction);
+  }
 }
