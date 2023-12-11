@@ -43,6 +43,7 @@
     <span>Transfer History: </span><span>${user.transferHist}</span><br/>
     <span>Crypto History: </span><span>${user.cryptoHist}</span><br/>
     <br/>
+    <a href='/savings_goal'>Savings Goals</a>
     <a href='/deposit'>Deposit</a>
     <a href='/withdraw'>Withdraw</a>
     <a href='/dispute'>Dispute</a>
