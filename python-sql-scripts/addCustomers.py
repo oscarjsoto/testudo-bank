@@ -92,6 +92,29 @@ CREATE TABLE CryptoHistory (
 '''
 cursor.execute(create_cryptohistory_table_sql)
 
+# Create SavingBucketOverview table
+create_savingbucketoverview_table_sql = '''
+CREATE TABLE SavingBucketOverview (
+  CustomerID varchar(255),
+  AllocatedBalance int,
+  FreeBalance int
+);
+'''
+cursor.execute(create_savingbucketoverview_table_sql)
+
+# Create SavingBucket table
+create_savingbucket_table_sql = '''
+CREATE TABLE SavingBucket (
+  CustomerID varchar(255),
+  GoalName varchar(255),
+  TargetDate DATETIME,
+  SavedBalance int,
+  AutoTransfer bool,
+  AutoTransferInterval int,
+  AutoTransferAmount int
+);
+'''
+cursor.execute(create_savingbucket_table_sql)
 
 
 # The two sets created below are used to ensure that this
