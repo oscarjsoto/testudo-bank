@@ -172,9 +172,44 @@ public class TestudoBankRepository {
   public static boolean doesCustomerExist(JdbcTemplate jdbcTemplate, String customerID) { 
     String getCustomerIDSql =  String.format("SELECT CustomerID FROM Customers WHERE CustomerID='%s';", customerID);
     if (jdbcTemplate.queryForObject(getCustomerIDSql, String.class) != null) {
-     return true;
+      return true;
     } else {
       return false;
     }
   }
+
+  public static void insertRowToSavingsBucketTable(JdbcTemplate jdbcTemplate, String customerID, String goalName, int targetAmount, int balance, String autoTransfer, int autoTransferlnterval, int autoTransferAmount) {
+    String insertRowToSavingsBucketSql = String.format("INSERT INTO SavingBucket VALUES ('%s', '%s', '%d', '%d', '%s', '%d', '%d');",
+                                                              customerID,
+                                                              goalName,
+                                                              targetAmount,
+                                                              balance,
+                                                              autoTransfer,
+                                                              autoTransferlnterval,
+                                                              autoTransferAmount);
+    jdbcTemplate.update(insertRowToSavingsBucketSql);
+  }
+
+  public static void setSavingBucketBalance(JdbcTemplate jdbcTemplate, String customerID, String goalName, int newBalanceInPennies) {
+    String updateSavingsBalanceSql = String.format("UPDATE SavingBucket SET SavedBalance = %d WHERE CustomerID='%s' AND GoalName='%s';", newBalanceInPennies, customerID, goalName);
+    jdbcTemplate.update(updateSavingsBalanceSql);
+  }
+
+  public static int getSavingBucketBalanceSum(JdbcTemplate jdbcTemplate, String customerID) {
+    String selectSumBalanceSql = String.format("SELECT SUM(SavedBalance) FROM SavingBucket WHERE CustomerID='%s';", customerID);
+    Integer sumBalance = jdbcTemplate.queryForObject(selectSumBalanceSql, Integer.class);
+    return sumBalance != null ? sumBalance : 0;
+  }
+
+  public static void removeSavingBucketRow(JdbcTemplate jdbcTemplate, String customerID, String goalName) {
+    String deleteRowSql = String.format("DELETE FROM SavingBucket WHERE CustomerID='%s' AND GoalName='%s';", customerID, goalName);
+    jdbcTemplate.update(deleteRowSql);
+  }
+
+  public static List<Map<String,Object>> getSavingBucketLogs(JdbcTemplate jdbcTemplate, String customerID) {
+    String getSavingBucketHistorySql = String.format("Select * from SavingBucket WHERE CustomerID='%s' ORDER BY GoalName;", customerID);
+    List<Map<String,Object>> savingBucketLogs = jdbcTemplate.queryForList(getSavingBucketHistorySql);
+    return savingBucketLogs;
+  }
+
 }
