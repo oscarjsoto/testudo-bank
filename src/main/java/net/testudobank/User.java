@@ -99,4 +99,33 @@ public class User {
   @Setter @Getter
   private int numDepositsForInterest;
 
+  //// Savings Bucket Fields ////
+
+  @Setter @Getter
+  private String goalName;
+
+  @Setter @Getter
+  private double amountToReallocate;
+
+  @Setter @Getter
+  private double freeBalance;
+
+  @Setter @Getter
+  private double allocatedBalance;
+
+  @Setter @Getter
+  private int autoTransferlnterval;
+
+  @Setter @Getter
+  private int autoTransferAmount;
+
+  @Setter @Getter
+  private String autoTransfer;
+
+  @Setter @Getter @Positive
+  private double targetAmount;
+
+  @Setter @Getter
+  private String bucketLogs;
+
 }
