@@ -180,6 +180,71 @@ public class MvcController {
 		return "sellcrypto_form";
 	}
 
+  /**
+   * HTML GET request handler that serves the "savings_login_form" page to the 
+   * user.
+   * An empty `User` object is also added to the Model as an Attribute to store
+   * the user's login form input.
+   * 
+   * @param model
+   * @return "savings_login_form" page
+   */
+  @GetMapping("/savings_goals")
+	public String showLoginFormForSavings(Model model) {
+		User user = new User();
+    model.addAttribute("user", user);
+
+		return "savings_login_form";
+	}
+
+  /**
+   * HTML GET request handler that serves the "savings_add_goal_form" page to 
+   * the user.
+   * An empty `User` object is also added to the Model as an Attribute to store
+   * the user's add goal form input.
+   * 
+   * @param model
+   * @return "savings_add_goal_form" page
+   */
+  @GetMapping("/add_goal")
+	public String showAddGoalForm(Model model) {
+    User user = new User();
+		model.addAttribute("user", user);
+		return "savings_add_goal_form";
+	}
+
+  /**
+   * HTML GET request handler that serves the "savings_remove_goal_form" page 
+   * to the user.
+   * An empty `User` object is also added to the Model as an Attribute to store
+   * the user's remove goal form input.
+   * 
+   * @param model
+   * @return "savings_remove_goal_form" page
+   */
+  @GetMapping("/remove_goal")
+	public String showRemoveGoalForm(Model model) {
+    User user = new User();
+		model.addAttribute("user", user);
+		return "savings_remove_goal_form";
+	}
+
+  /**
+   * HTML GET request handler that serves the "savings_reallocate_form" page
+   * to the user.
+   * An empty `User` object is also added to the Model as an Attribute to store
+   * the user's withdraw form input.
+   * 
+   * @param model
+   * @return "savings_reallocate_form" page
+   */
+  @GetMapping("/reallocate")
+	public String showReallocateGoalForm(Model model) {
+    User user = new User();
+		model.addAttribute("user", user);
+		return "savings_reallocate_form";
+	}
+
   //// HELPER METHODS ////
 
   /**
@@ -238,6 +303,29 @@ public class MvcController {
     user.setEthPrice(cryptoPriceClient.getCurrentEthValue());
     user.setSolPrice(cryptoPriceClient.getCurrentSolValue());
     user.setNumDepositsForInterest(user.getNumDepositsForInterest());
+  }
+
+
+  /**
+   * Helper method that queries the MySQL DB for the customer account info 
+   * (Allocated Balance, Free Balance, and Buckey Logs)
+   * and adds these values to the `user` Model Attribute so that they can be displayed in the "account_info" page.
+   * 
+   * @param user
+   */
+  private void updateBucketInfo(User user) {
+
+    List<Map<String,Object>> savingBucketLogs = TestudoBankRepository.getSavingBucketLogs(jdbcTemplate, user.getUsername());
+    String savingBucketLogOutput = HTML_LINE_BREAK;
+    for(Map<String, Object> savingBucketLog : savingBucketLogs){
+      savingBucketLogOutput += savingBucketLog + HTML_LINE_BREAK;
+    }
+
+    double allocated =  (int)TestudoBankRepository.getSavingBucketBalanceSum(jdbcTemplate, user.getUsername())/100.0;
+
+    user.setBucketLogs(savingBucketLogOutput);
+    user.setAllocatedBalance(allocated);
+    user.setFreeBalance(user.getBalance() - allocated);
   }
 
   // Converts dollar amounts in frontend to penny representation in backend MySQL DB
@@ -810,4 +898,140 @@ public class MvcController {
 
   }
 
+  /**
+   * HTML POST request handler that uses user input from Savings Login Form 
+   * page to determine login success or failure.
+   * 
+   * Queries 'passwords' table in MySQL DB for the correct password associated 
+   * with the username ID given by the user. Compares the user's password 
+   * attempt with the correct password.
+   * 
+   * If the password attempt is correct, the "account_info" page is served to 
+   * the customer with all account details retrieved from the MySQL DB.
+   * 
+   * If the password attempt is incorrect, the user is redirected to the 
+   * "welcome" page.
+   * 
+   * @param user
+   * @return "savings_buckets_overview" page if login successful. Otherwise
+   * redirect to "welcome" page.
+   */
+  @PostMapping("/savings_goals")
+	public String submitLoginFormForSavings(@ModelAttribute("user") User user) {
+    // Print user's existing fields for debugging
+		System.out.println(user);
+
+    String userID = user.getUsername();
+    String userPasswordAttempt = user.getPassword();
+
+    // Retrieve correct password for this customer.
+    String userPassword = TestudoBankRepository.getCustomerPassword(jdbcTemplate, userID);
+
+    if (userPasswordAttempt.equals(userPassword)) {
+      updateAccountInfo(user);
+      updateBucketInfo(user);
+
+      return "savings_buckets_overview";
+    } else {
+      return "welcome";
+    }
+	}
+
+  /**
+   * HTML POST request handler for the Add Goal Form page.
+   * 
+   * @param user
+   * @return "savings_buckets_overview" page if valid deposit request. 
+   * Otherwise, redirect to "welcome" page.
+   */
+  @PostMapping("/add_goal")
+  public String submitAddGoal(@ModelAttribute("user") User user) {
+    String userID = user.getUsername();
+    String userPasswordAttempt = user.getPassword();
+    String userPassword = TestudoBankRepository.getCustomerPassword(jdbcTemplate, userID);
+
+    //// Invalid Input/State Handling ////
+
+    // unsuccessful login
+    if (userPasswordAttempt.equals(userPassword) == false) {
+      return "welcome";
+    }
+
+    // Get Form Information
+    String goalName = user.getGoalName();
+    int targetAmountInPennies = convertDollarsToPennies(user.getTargetAmount());
+    String autoTransfer = user.getAutoTransfer();
+    int autoTransferAmt = user.getAutoTransferAmount();
+    int autoTransferlnterval = user.getAutoTransferlnterval();
+
+    TestudoBankRepository.insertRowToSavingsBucketTable(jdbcTemplate, userID, goalName, targetAmountInPennies, 0, autoTransfer, autoTransferAmt, autoTransferlnterval);
+
+    // update Model so that View can access new main balance, overdraft balance, and logs
+    updateAccountInfo(user);
+    updateBucketInfo(user);
+    return "savings_buckets_overview";
+  }
+
+
+  /**
+   * HTML POST request handler for the Remove Goal Form page.
+   * 
+   * @param user
+   * @return "savings_buckets_overview" page if valid deposit request. 
+   * Otherwise, redirect to "welcome" page.
+   */
+  @PostMapping("/remove_goal")
+  public String submitRemoveGoal(@ModelAttribute("user") User user) {
+    String userID = user.getUsername();
+    String userPasswordAttempt = user.getPassword();
+    String userPassword = TestudoBankRepository.getCustomerPassword(jdbcTemplate, userID);
+
+    //// Invalid Input/State Handling ////
+
+    // unsuccessful login
+    if (userPasswordAttempt.equals(userPassword) == false) {
+      return "welcome";
+    }
+
+    // Get Form Information
+    String goalName = user.getGoalName();
+
+    TestudoBankRepository.removeSavingBucketRow(jdbcTemplate, userID, goalName);
+
+    // update Model so that View can access new main balance, overdraft balance, and logs
+    updateAccountInfo(user);
+    updateBucketInfo(user);
+    return "savings_buckets_overview";
+  }
+
+  /**
+   * HTML POST request handler for the Reallocate Goal Form page.
+   * 
+   * @param user
+   * @return "savings_buckets_overview" page if valid deposit request. 
+   * Otherwise, redirect to "welcome" page.
+   */
+  @PostMapping("/reallocate")
+  public String submitReallocateGoal(@ModelAttribute("user") User user) {
+    String userID = user.getUsername();
+    String userPasswordAttempt = user.getPassword();
+    String userPassword = TestudoBankRepository.getCustomerPassword(jdbcTemplate, userID);
+
+    //// Invalid Input/State Handling ////
+
+    // unsuccessful login
+    if (userPasswordAttempt.equals(userPassword) == false) {
+      return "welcome";
+    }
+
+    // Get Form Information
+    String goalName = user.getGoalName();
+    int savedAmountInPennies = convertDollarsToPennies(user.getAmountToReallocate());
+    TestudoBankRepository.setSavingBucketBalance(jdbcTemplate, userID, goalName, savedAmountInPennies);
+
+    // update Model so that View can access new main balance, overdraft balance, and logs
+    updateAccountInfo(user);
+    updateBucketInfo(user);
+    return "savings_buckets_overview";
+  }
 }
