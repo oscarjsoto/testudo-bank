@@ -34,10 +34,11 @@
 		<span>Balance: $</span><span>${user.balance}</span><br/>
     <span>Overdraft Balance: $</span><span>${user.overDraftBalance}</span><br/>
     <br/>
-    <span>Savings Overview</span><br/>
-    <span>Allocated Balance: </span><span>${user.allocatedBalance}</span><br/>
-    <span>Free Balance: </span><span>${user.freeBalance}</span><br/>
-    <span>Savings Bucket: </span><span>${user.bucketLogs}</span><br/>
+    <h2>Savings Overview</h2><br/>
+    <span>Allocated Balance: $</span><span>${user.allocatedBalance}</span><br/>
+    <span>Unallocated Balance: $</span><span>${user.freeBalance}</span><br/>
+    <br/>
+    <span>Savings Buckets: </span><span>${user.bucketLogs}</span><br/>
     <br/>
     <a href='/add_goal'>Add new goal</a>
     <a href='/reallocate'>Change allocations</a>

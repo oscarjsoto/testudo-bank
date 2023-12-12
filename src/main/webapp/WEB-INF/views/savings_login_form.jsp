@@ -37,7 +37,7 @@
 	<div align="center">
 		<h2>Please sign in: </h2>
         <img src="https://fanapeel.com/wp-content/uploads/logo_-university-of-maryland-terrapins-testudo-turtle-hold-red-white-m.png" style="float:left;width:100px;height:100px;">
-		<form:form action="login2" method="post" modelAttribute="user">
+		<form:form action="savings_goals" method="post" modelAttribute="user">
 			<form:label path="username">Username:</form:label>
 			<form:input path="username"/><br/>
 			
