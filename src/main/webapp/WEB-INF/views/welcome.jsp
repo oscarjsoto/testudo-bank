@@ -51,8 +51,8 @@ uri="http://www.springframework.org/tags/form" %>
 			<a href="/withdraw">Withdraw</a> <br />
 			<a href="/dispute">Dispute</a> <br />
 			<a href="/transfer">Transfer</a> <br />
-			<a href="/savings_goals">View Savings Goals</a>
-			<a href="/buycrypto">Buy Cryptocurrency</a>
+			<a href="/savings_goals">View Savings Goals</a> <br />
+			<a href="/buycrypto">Buy Cryptocurrency</a> <br />
 			<a href="/sellcrypto">Sell Cryptocurrency</a> <br />
 		</div>
 	</body>
