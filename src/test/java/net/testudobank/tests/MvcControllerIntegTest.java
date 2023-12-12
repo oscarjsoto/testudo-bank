@@ -1581,5 +1581,47 @@ public void testTransferPaysOverdraftAndDepositsRemainder() throws SQLException,
             .build();
     cryptoTransactionTester.test(cryptoTransaction);
   }
+
+  /**
+   * Verifies the simplest savings bucket case.
+   * The customer's Balance in the Customers table should be allocated to the 
+   * Goal in the Savings bucket table,
+   * 
+   * Assumes that the customer's account is in the simplest state
+   * (not in overdraft, account is not frozen due to too many transaction 
+   * disputes, etc.)
+   * 
+   * @throws SQLException
+   * @throws ScriptException
+   */
+  // @Test
+  // public void testSimpleGoal() throws SQLException, ScriptException {
+  //   // initialize customer1 with a balance of $123.45 (to make sure this works for non-whole dollar amounts). represented as pennies in the DB.
+  //   double CUSTOMER1_BALANCE = 123.45;
+  //   int CUSTOMER1_BALANCE_IN_PENNIES = MvcControllerIntegTestHelpers.convertDollarsToPennies(CUSTOMER1_BALANCE);
+  //   MvcControllerIntegTestHelpers.addCustomerToDB(dbDelegate, CUSTOMER1_ID, CUSTOMER1_PASSWORD, CUSTOMER1_FIRST_NAME, CUSTOMER1_LAST_NAME, CUSTOMER1_BALANCE_IN_PENNIES, 0);
+
+  //   // Prepare Goal customer 1's account.
+  //   double CUSTOMER1_AMOUNT_TO_DEPOSIT = 12.34; // user input is in dollar amount, not pennies.
+  //   User customer1goalinput = new User();
+  //   customer1goalinput.setUsername(CUSTOMER1_ID);
+  //   customer1goalinput.setPassword(CUSTOMER1_PASSWORD);
+  //   customer1goalinput.setGoalName("testGoalName");
+  //   customer1goalinput.setTargetAmount(100);
+  //   customer1goalinput.setAutoTransfer("Manual");
+  //   customer1goalinput.setAutoTransferAmount(0);
+  //   customer1goalinput.setAutoTransferlnterval(0);
+
+  //   // send request to the Deposit Form's POST handler in MvcController
+  //   controller.submitAddGoal(customer1goalinput);
+
+  //   // Prepare Saved Balance for customer 1's account.
+  //   customer1goalinput.setGoalName("testGoalName");
+  //   customer1goalinput.setAmountToReallocate(CUSTOMER1_AMOUNT_TO_DEPOSIT);
+  //   controller.submitReallocateGoal(customer1goalinput);
+
+  //   // Verify if goal had funds allocated to it
+  //   assertEquals(12.34, customer1goalinput.getAllocatedBalance());
+  // }
   
 }
