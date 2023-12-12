@@ -107,9 +107,9 @@ create_savingbucket_table_sql = '''
 CREATE TABLE SavingBucket (
   CustomerID varchar(255),
   GoalName varchar(255),
-  TargetDate DATETIME,
+  TargetAmount int,
   SavedBalance int,
-  AutoTransfer bool,
+  AutoTransfer varchar(255),
   AutoTransferInterval int,
   AutoTransferAmount int
 );
@@ -169,6 +169,15 @@ for i in range(num_customers_to_add):
     '''.format("'" + customer_id + "'",
                 "'" + customer_password + "'")
     cursor.execute(insert_password_sql)
+    
+    # add customer ID and password to Passwords table
+    insert_saving_bucket_overview_sql = '''
+    INSERT INTO SavingBucketOverview
+    VALUES  ({0},{1},{2});
+    '''.format("'" + customer_id + "'",
+                0,
+                0)
+    cursor.execute(insert_saving_bucket_overview_sql)
     
     # add this customer's randomly-generated ID to the set
     # to ensure this ID is not re-used by accident.
